@@ -6,6 +6,7 @@ Multi-Option Potentiometer
 4) LED Pattern flash
 */
 
+int ledSolarPIN = 9;
 int ledOutputPIN = 10;
 int ledOutputPIN2 = 11;
 int optionState = 0;
@@ -14,6 +15,15 @@ int option = 0;
 int patternTimer = 0;
 int brightness1 = 0;
 int brightness2 = 0;
+int solarPower = 0;
+
+void setup()
+{
+  Serial.begin(9600);
+  pinMode(ledOutputPIN, OUTPUT);
+  pinMode(ledOutputPIN2, OUTPUT);
+  pinMode(ledSolarPIN, OUTPUT);
+}
 
 enum PotentStates{PotentOff, oneLed, twoLed, patternLed} PotentState;
 void potentController()
@@ -367,11 +377,12 @@ void patternLedController()
     }
   }
 }
-void setup()
+
+void solarLedController()
 {
-  Serial.begin(9600);
-  pinMode(ledOutputPIN, OUTPUT);
-  pinMode(ledOutputPIN2, OUTPUT);
+  solarPower = analogRead(A1);
+  solarPower = map(solarPower, 0, 255, 0, 255);
+  analogWrite(ledSolarPIN, solarPower);
 }
 
 void loop()
@@ -382,4 +393,5 @@ void loop()
   oneLedController();
   twoLedController();
   patternLedController();
+  solarLedController();
 }
