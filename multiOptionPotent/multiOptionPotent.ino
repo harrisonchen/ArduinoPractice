@@ -229,9 +229,9 @@ void patternLedController()
     }
     case pattern1:
     {
-      if(patternTimer < 10000)
+      if(patternTimer < 5000)
       {
-        if(patternTimer % 40 == 0)
+        if(patternTimer % 20 == 0)
         {
           brightness1 += 1;
         }
@@ -247,9 +247,9 @@ void patternLedController()
     }
     case pattern2:
     {
-      if(patternTimer < 10000)
+      if(patternTimer < 5000)
       {
-        if(patternTimer % 40 == 0)
+        if(patternTimer % 20 == 0)
         {
           brightness2 += 1;
         }
@@ -267,9 +267,9 @@ void patternLedController()
     }
     case pattern3:
     {
-      if(patternTimer < 10000)
+      if(patternTimer < 5000)
       {
-        if(patternTimer % 40 == 0)
+        if(patternTimer % 20 == 0)
         {
           brightness1 += 1;
           brightness2 += 1;
@@ -288,9 +288,9 @@ void patternLedController()
     }
     case pattern4:
     {
-      if(patternTimer < 10000)
+      if(patternTimer < 5000)
       {
-        if(patternTimer % 40 == 0)
+        if(patternTimer % 20 == 0)
         {
           brightness1 += 1;
           brightness2 += 1;
@@ -309,9 +309,9 @@ void patternLedController()
     }
     case pattern5:
     {
-      if(patternTimer < 10000)
+      if(patternTimer < 5000)
       {
-        if(patternTimer % 40 == 0)
+        if(patternTimer % 20 == 0)
         {
           brightness1 += 1;
           brightness2 += 1;
@@ -328,9 +328,9 @@ void patternLedController()
     }
     case pattern6:
     {
-      if(patternTimer < 10000)
+      if(patternTimer < 5000)
       {
-        if(patternTimer % 40 == 0)
+        if(patternTimer % 20 == 0)
         {
           brightness2 -= 1;
         }
@@ -346,9 +346,9 @@ void patternLedController()
     }
     case pattern7:
     {
-      if(patternTimer < 10000)
+      if(patternTimer < 5000)
       {
-        if(patternTimer % 40 == 0)
+        if(patternTimer % 20 == 0)
         {
           brightness1 -= 1;
         }
@@ -381,7 +381,7 @@ void patternLedController()
 void solarLedController()
 {
   solarPower = analogRead(A1);
-  solarPower = map(solarPower, 0, 255, 0, 255);
+  solarPower = map(solarPower, 0, 1023, 0, 255);
   analogWrite(ledSolarPIN, solarPower);
 }
 
