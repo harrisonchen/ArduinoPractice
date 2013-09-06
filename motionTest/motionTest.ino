@@ -55,11 +55,13 @@ int16_t gx, gy, gz;
 int converted_ax = 0;
 int converted_ay = 0;
 int velocity = 0;
-int gyroLocation = 0x01;
+int gyroLocation1 = 0x01;
+int gyroLocation2 = 0x00;
 int dataPin = 2;
 int latchPin = 3;
 int clockPin = 4;
 int clearPin = 5;
+int ledLevel = 1;
 
 // uncomment "OUTPUT_READABLE_ACCELGYRO" if you want to see a tab-separated
 // list of the accel X/Y/Z and then gyro X/Y/Z values in decimal. Easy to read,
@@ -127,13 +129,14 @@ void setup() {
     pinMode(clearPin, OUTPUT);
 }
 
-void shiftVal(int val)
+void shiftVal(int val1, int val2)
 {
   digitalWrite(latchPin, LOW);
   digitalWrite(clearPin, LOW);
   digitalWrite(clearPin, HIGH);
   //shiftOut(dataPin, clockPin, bitOrder, value);
-  shiftOut(dataPin, clockPin, MSBFIRST, val);
+  shiftOut(dataPin, clockPin, MSBFIRST, val1);
+  shiftOut(dataPin, clockPin, MSBFIRST, val2);
   digitalWrite(latchPin, HIGH);
 }
 
@@ -141,10 +144,26 @@ void updateGyro(int16_t ax, int16_t ay)
 {
   if(ay < -4000 && ay > -8000)
   {
-    if(gyroLocation != 0x80)
+    if(ledLevel < 8)
     {
-      gyroLocation = gyroLocation << 0x01;
+      gyroLocation1 = gyroLocation1 << 0x01;
+      gyroLocation2 = 0x00;
+      ledLevel++;
     }
+    else if(ledLevel >= 8 && ledLevel < 16)
+    {
+      ledLevel++;
+      if(ledLevel == 9)
+      {
+        gyroLocation2 = 0x01;
+        gyroLocation1 = 0x00;
+      }
+      else
+      {
+        gyroLocation2 = gyroLocation2 << 0x01;
+        gyroLocation1 = 0x00;
+      }
+    } 
     /*converted_ay = map(ay, -75, -17000, 10, 255);
     if(converted_ax <= converted_ay)
     {
@@ -152,25 +171,88 @@ void updateGyro(int16_t ax, int16_t ay)
     }*/
     delay(500);
   }
-  else if(ay <= -8000)
+  else if(ay <= -8000 && ay > -12000)
   {
-    if(gyroLocation != 0x80)
+    if(ledLevel < 8)
     {
-      gyroLocation = gyroLocation << 0x01;
+      gyroLocation1 = gyroLocation1 << 0x01;
+      gyroLocation2 = 0x00;
+      ledLevel++;
     }
+    else if(ledLevel >= 8 && ledLevel < 16)
+    {        
+      ledLevel++;
+      if(ledLevel == 9)
+      {
+        gyroLocation2 = 0x01;
+        gyroLocation1 = 0x00;
+
+      }
+      else
+      {
+        gyroLocation2 = gyroLocation2 << 0x01;
+        gyroLocation1 = 0x00;
+      }
+    } 
     /*converted_ay = map(ay, -75, -17000, 10, 255);
     if(converted_ax <= converted_ay)
     {
       analogWrite(LED_PIN, converted_ay);
     }*/
     delay(200);
+  }
+  else if(ay <= -12000)
+  {
+    if(ledLevel < 8)
+    {
+      gyroLocation1 = gyroLocation1 << 0x01;
+      gyroLocation2 = 0x00;
+      ledLevel++;
+    }
+    else if(ledLevel >= 8 && ledLevel < 16)
+    {        
+      ledLevel++;
+      if(ledLevel == 9)
+      {
+        gyroLocation2 = 0x01;
+        gyroLocation1 = 0x00;
+
+      }
+      else
+      {
+        gyroLocation2 = gyroLocation2 << 0x01;
+        gyroLocation1 = 0x00;
+      }
+    } 
+    /*converted_ay = map(ay, -75, -17000, 10, 255);
+    if(converted_ax <= converted_ay)
+    {
+      analogWrite(LED_PIN, converted_ay);
+    }*/
+    delay(50);
   }
   else if(ay >= 4000 && ay < 8000)
   {
-    if(gyroLocation != 0x01)
+    if(ledLevel > 1 && ledLevel <= 8)
     {
-      gyroLocation = gyroLocation >> 0x01;
+      gyroLocation1 = gyroLocation1 >> 0x01;
+      gyroLocation2 = 0x00;
+      ledLevel--;
     }
+    else if(ledLevel > 8 && ledLevel <= 16)
+    {
+      ledLevel--;
+      if(ledLevel == 8)
+      {
+        gyroLocation2 = 0x00;
+        gyroLocation1 = 0x80;
+      }
+      else
+      {
+        gyroLocation1 = 0x00;
+        gyroLocation2 = gyroLocation2 >> 0x01;
+      }
+    } 
     /*converted_ay = map(ay, -75, 17000, 10, 255);
     if(converted_ax <= converted_ay)
     {
@@ -178,11 +260,27 @@ void updateGyro(int16_t ax, int16_t ay)
     }*/
     delay(500);
   }
-  else if(ay >= 8000)
+  else if(ay >= 8000 && ay < 12000)
   {
-    if(gyroLocation != 0x01)
+    if(ledLevel > 1 && ledLevel <= 8)
     {
-      gyroLocation = gyroLocation >> 0x01;
+      gyroLocation1 = gyroLocation1 >> 0x01;
+      gyroLocation2 = 0x00;
+      ledLevel--;
+    }
+    else if(ledLevel > 8 && ledLevel <= 16)
+    {
+      ledLevel--;
+      if(ledLevel == 8)
+      {
+        gyroLocation2 = 0x00;
+        gyroLocation1 = 0x80;
+      }
+      else
+      {
+        gyroLocation1 = 0x00;
+        gyroLocation2 = gyroLocation2 >> 0x01;
+      }
     }
     /*converted_ay = map(ay, -75, 17000, 10, 255);
     if(converted_ax <= converted_ay)
@@ -191,7 +289,35 @@ void updateGyro(int16_t ax, int16_t ay)
     }*/
     delay(200);
   }
-  Serial.println(gyroLocation);
+  else if(ay >= 12000)
+  {
+    if(ledLevel > 1 && ledLevel <= 8)
+    {
+      gyroLocation1 = gyroLocation1 >> 0x01;
+      gyroLocation2 = 0x00;
+      ledLevel--;
+    }
+    else if(ledLevel > 8 && ledLevel <= 16)
+    {
+      ledLevel--;
+      if(ledLevel == 8)
+      {
+        gyroLocation2 = 0x00;
+        gyroLocation1 = 0x80;
+      }
+      else
+      {
+        gyroLocation1 = 0x00;
+        gyroLocation2 = gyroLocation2 >> 0x01;
+      }
+    }
+    /*converted_ay = map(ay, -75, 17000, 10, 255);
+    if(converted_ax <= converted_ay)
+    {
+      analogWrite(LED_PIN, converted_ay);
+    }*/
+    delay(50);
+  }
 }
 
 void loop() {
@@ -223,7 +349,7 @@ void loop() {
     #endif
 
     updateGyro(ax, ay);
-    shiftVal(gyroLocation);
+    shiftVal(gyroLocation2, gyroLocation1);
 
     //Serial.print(converted_ax);Serial.print("\t");Serial.print(converted_ay);
 }
