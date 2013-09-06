@@ -1,6 +1,7 @@
 int dataPin = 2;
 int latchPin = 3;
 int clockPin = 4;
+int clearPin = 5;
 //int time = 10;
 
 int serialInput = 0;
@@ -11,11 +12,14 @@ void setup()
   pinMode(dataPin, OUTPUT);
   pinMode(latchPin, OUTPUT);
   pinMode(clockPin, OUTPUT);
+  pinMode(clearPin, OUTPUT);
 }
 
 void shiftVal(int val)
 {
   digitalWrite(latchPin, LOW);
+  digitalWrite(clearPin, LOW);
+  digitalWrite(clearPin, HIGH);
   //shiftOut(dataPin, clockPin, bitOrder, value);
   shiftOut(dataPin, clockPin, MSBFIRST, val);
   digitalWrite(latchPin, HIGH);
