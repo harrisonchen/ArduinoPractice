@@ -1,3 +1,20 @@
+#include <I2Cdev.h>
+#include <MPU6050.h>
+
+#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+    #include <Wire.h>
+#endif
+
+MPU6050 accelgyro;
+
+int16_t ax, ay, az;
+int16_t gx, gy, gz;
+
+int converted_ax = 0;
+int converted_ay = 0;
+
+#define OUTPUT_READABLE_ACCELGYRO
+
 int dataPin = 2;
 int latchPin = 3;
 int clockPin = 4;
@@ -9,9 +26,29 @@ int timer = 0;
 int timerVar = 128;
 int timerVarState = 1;
 int corner = 1;
+int ledPointRow = 0x08;
+int ledPointCol = 0x10;
+
 
 void setup()
 {
+    // join I2C bus (I2Cdev library doesn't do this automatically)
+    #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+        Wire.begin();
+    #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
+        Fastwire::setup(400, true);
+    #endif
+    
+    Serial.begin(38400);
+
+    // initialize device
+    Serial.println("Initializing I2C devices...");
+    accelgyro.initialize();
+
+    accelgyro.setXGyroOffset(220);
+    accelgyro.setYGyroOffset(76);
+    accelgyro.setZGyroOffset(-85);
+  
   pinMode(dataPin, OUTPUT);
   pinMode(latchPin, OUTPUT);
   pinMode(clockPin, OUTPUT);
@@ -31,7 +68,7 @@ void shiftVal(int redByte, int greenByte, int blueByte, int colByte)
   digitalWrite(latchPin, HIGH);
 }
 
-void loop()
+void controller1()
 {
   while(timer < timerVar)
   {
@@ -192,4 +229,15 @@ void loop()
     redByte = 0x80;
     colByte = 0x80;
   }
+}
+
+void controller2()
+{
+  accelgyro.getRotation(&gx, &gy, &gz);
+  shiftVal(0,0,ledPointRow,ledPointCol);
+}
+
+void loop()
+{
+  controller2();
 }
